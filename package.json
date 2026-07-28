@@ -10,6 +10,16 @@
     "vuma": "bin/CLI.js",
     "vt": "bin/CLI.js"
   },
+  "files": [
+    "addons",
+    "bin",
+    "commands",
+    "libs",
+    "resources",
+    "utils",
+    "App.js",
+    "install.sh"
+  ],
   "homepage": "https://traffic.nyxseo.com",
   "keywords": [
     "vuma traffic",
