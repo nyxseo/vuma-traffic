@@ -1,16 +1,16 @@
 /**
  * 
- * Published by Jago Code
+ * Published by Vuma Technologies
  * 
- * Website       : https://traffic.jagocode.id
- * Documentation : https://docs.jagocode.id
+ * Website       : https://traffic.nyxseo.com
+ * Documentation : https://docs.nyxseo.com
  * Last Update   : 08 May 2025 02:19
  * 
  */
 
 /* -------------------------------------
 NOTE: 
-This tool is a paid product exclusively published by Jago Code.
+This tool is a paid product exclusively Published by Vuma Technologies.
 Any similar tool found elsewhere is guaranteed to be unauthorized.
 ------------------------------------- */
 

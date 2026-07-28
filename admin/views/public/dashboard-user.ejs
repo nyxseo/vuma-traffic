@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Vuma Traffic</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0a0e1a;color:#e2e8f0;overflow-x:hidden}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:240px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border-right:1px solid rgba(255,255,255,0.06);padding:1.5rem;display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar .logo{font-size:1.25rem;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2rem;display:block;text-decoration:none}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border-radius:0.75rem;font-size:0.875rem;color:#94a3b8;text-decoration:none;transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+    .nav-item:hover,.nav-item.active{background:rgba(59,130,246,0.1);color:#e2e8f0}
+    .nav-item.active{background:rgba(59,130,246,0.15);color:#60a5fa}
+    .user-section{margin-top:auto;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06)}
+    .user-avatar{width:2rem;height:2rem;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0}
+    .user-info{flex:1;min-width:0}
+    .user-name{font-size:0.8125rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .user-email{font-size:0.75rem;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .main{flex:1;padding:2rem;overflow-y:auto}
+    .page-title{font-size:1.5rem;font-weight:700;margin-bottom:0.25rem}
+    .page-subtitle{color:#64748b;font-size:0.875rem;margin-bottom:2rem}
+    .plan-banner{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.1));border:1px solid rgba(59,130,246,0.2);border-radius:1.25rem;padding:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
+    .plan-name{font-size:1.25rem;font-weight:700}
+    .plan-status{display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem}
+    .plan-status .dot{width:0.5rem;height:0.5rem;border-radius:50%;background:#22c55e}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:1.25rem;padding:1.25rem}
+    .stat-label{font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.375rem}
+    .stat-value{font-size:1.75rem;font-weight:800}
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-bottom:1.5rem}
+    .card{background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:1.25rem;padding:1.5rem}
+    .card-title{font-size:1rem;font-weight:600;margin-bottom:1rem}
+    .feature-list{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.8125rem;color:#94a3b8}
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:0.75rem;font-size:0.8125rem;font-weight:600;text-decoration:none;transition:all 0.3s;cursor:pointer;border:none}
+    .btn-primary{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(59,130,246,0.3)}
+    .btn-secondary{background:rgba(255,255,255,0.05);color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)}
+    .license-box{background:rgba(0,0,0,0.3);border-radius:0.75rem;padding:0.75rem;font-size:0.75rem;margin-top:0.75rem}
+    .license-box .label{color:#64748b;margin-bottom:0.25rem}
+    .license-box .key{font-family:monospace;word-break:break-all;color:#94a3b8;font-size:0.6875rem}
+    .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;max-width:800px}
+    .pricing-card{background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:1.25rem;padding:1.5rem;position:relative}
+    .pricing-card.recommended{border-color:rgba(59,130,246,0.3);box-shadow:0 0 30px rgba(59,130,246,0.1)}
+    .pricing-name{font-size:1.125rem;font-weight:700;margin-bottom:0.25rem}
+    .pricing-price{font-size:2rem;font-weight:800;margin-bottom:0.25rem}
+    .pricing-desc{font-size:0.8125rem;color:#64748b;margin-bottom:1rem}
+    .pricing-perks{list-style:none;font-size:0.8125rem;color:#94a3b8;margin-bottom:1.5rem;padding:0}
+    .pricing-perks li{padding:0.3rem 0}
+    .badge{display:inline-block;padding:0.2rem 0.75rem;border-radius:999px;font-size:0.75rem;font-weight:600;background:linear-gradient(135deg,#3b82f6,#6366f1);margin-bottom:0.75rem}
+    @media(max-width:768px){
+      .sidebar{width:56px;padding:1rem 0.75rem}
+      .sidebar .logo{font-size:0;overflow:hidden}
+      .sidebar .logo::first-letter{font-size:1.25rem}
+      .nav-item span:last-child{display:none}
+      .user-info{display:none}
+      .main{padding:1rem}
+    }
+    [x-cloak]{display:none!important}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a href="/" class="logo">Vuma</a>
+    <nav style="flex:1;display:flex;flex-direction:column;gap:0.25rem">
+      <button class="nav-item active" onclick="switchTab('dashboard',this)">
+        <span>&#9632;</span> <span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('upgrade',this)">
+        <span>&#9650;</span> <span>Upgrade</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('settings',this)">
+        <span>&#9881;</span> <span>Settings</span>
+      </button>
+    </nav>
+    <div class="user-section">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div class="user-avatar"><%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %></div>
+        <div class="user-info">
+          <div class="user-name"><%= user.name %></div>
+          <div class="user-email"><%= user.email %></div>
+        </div>
+      </div>
+      <button onclick="logout()" style="margin-top:0.75rem;width:100%;padding:0.5rem;border-radius:0.5rem;font-size:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:#64748b;cursor:pointer">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Dashboard Tab -->
+    <div id="tab-dashboard">
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Your traffic performance and account overview.</p>
+
+      <div class="plan-banner">
+        <div>
+          <div class="plan-status"><span class="dot"></span> Active</div>
+          <div class="plan-name"><%= plan.name %></div>
+        </div>
+        <div style="text-align:right;font-size:0.8125rem;color:#94a3b8">
+          <div><%= plan.trafficLimitDaily >= 999999999 ? 'Unlimited' : (plan.trafficLimitDaily || 0).toLocaleString() %> visits/day</div>
+          <div style="margin-top:0.25rem"><%= plan.threadLimit %> threads &middot; <%= plan.fingerprintLimit >= 999999 ? 'Unlimited' : plan.fingerprintLimit %> fingerprints</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Hits Today</div>
+          <div class="stat-value" id="stat-hits-today">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Hits</div>
+          <div class="stat-value" id="stat-hits-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Remaining Today</div>
+          <div class="stat-value" id="stat-remaining">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fingerprints</div>
+          <div class="stat-value" id="stat-fingerprints">0</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Plan Features</div>
+          <div class="feature-list">
+            <span><%= plan.isProxyEnabled ? '+' : '-' %> Proxy</span>
+            <span><%= plan.isAdNetworksEnabled ? '+' : '-' %> Ad Networks</span>
+            <span><%= plan.isSearchEngine ? '+' : '-' %> Search Engine</span>
+            <span><%= plan.isBoostRpmEnabled ? '+' : '-' %> Boost RPM</span>
+            <span><%= plan.isViewAds ? '+' : '-' %> View Ads</span>
+            <span><%= plan.isVerifiedFingerprint ? '+' : '-' %> Verified FP</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Desktop App</div>
+          <p style="font-size:0.8125rem;color:#64748b;margin-bottom:1rem">Download the Vuma Desktop app to start generating traffic from your computer.</p>
+          <a href="/download" class="btn btn-primary">Download Vuma Desktop</a>
+          <div class="license-box">
+            <div class="label">License Key</div>
+            <div class="key"><%= token %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upgrade Tab -->
+    <div id="tab-upgrade" style="display:none">
+      <h1 class="page-title">Upgrade Plan</h1>
+      <p class="page-subtitle">Pick a plan that matches your traffic needs.</p>
+      <div class="pricing-grid">
+        <% if (typeof plans !== 'undefined' && plans && plans.length) { plans.filter(p => p.id !== 'free').forEach(function(p) { %>
+        <div class="pricing-card <%= p.id === 'pro' ? 'recommended' : '' %>">
+          <% if (p.id === 'pro') { %><div class="badge">Most Popular</div><% } %>
+          <div class="pricing-name"><%= p.name %></div>
+          <div class="pricing-price">$<%= Math.round(p.priceMonthly / 16000) %><span style="font-size:0.875rem;font-weight:400;color:#64748b">/month</span></div>
+          <div class="pricing-desc"><%= p.description %></div>
+          <ul class="pricing-perks">
+            <li>+ <%= p.trafficLimitDaily >= 999999999 ? 'Unlimited' : p.trafficLimitDaily.toLocaleString() %> visits/day</li>
+            <li>+ <%= p.fingerprintLimit >= 999999 ? 'Unlimited' : p.fingerprintLimit %> fingerprints</li>
+            <li>+ <%= p.threadLimit %> threads</li>
+            <li><%= p.isProxyEnabled ? '+ Proxy' : '- Proxy' %></li>
+            <li><%= p.isAdNetworksEnabled ? '+ Ad networks' : '- Ad networks' %></li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="upgrade('<%= p.id %>')">
+            Subscribe &middot; $<%= Math.round(p.priceMonthly / 16000) %>/month
+          </button>
+        </div>
+        <% }); } %>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab-settings" style="display:none">
+      <h1 class="page-title">Settings</h1>
+      <p class="page-subtitle">Manage your account settings.</p>
+      <div class="card" style="max-width:480px">
+        <div style="margin-bottom:1rem">
+          <label style="display:block;font-size:0.8125rem;color:#94a3b8;margin-bottom:0.375rem">Name</label>
+          <input type="text" id="settings-name" value="<%= user.name %>" style="width:100%;padding:0.75rem 1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;color:#e2e8f0;font-size:0.875rem;outline:none">
+        </div>
+        <div style="margin-bottom:1.5rem">
+          <label style="display:block;font-size:0.8125rem;color:#94a3b8;margin-bottom:0.375rem">Email</label>
+          <input type="email" value="<%= user.email %>" disabled style="width:100%;padding:0.75rem 1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;color:#475569;font-size:0.875rem;outline:none">
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const TOKEN = '<%= token %>';
+
+async function api(path, opts = {}) {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 15000);
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  headers['Authorization'] = 'Bearer ' + TOKEN;
+  try {
+    const res = await fetch(path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : undefined, signal: controller.signal });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error ' + res.status);
+    return data;
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error('Request timed out');
+    throw e;
+  }
+}
+
+async function loadStats() {
+  try {
+    const r = await api('/api/stats');
+    const s = r.stats || {};
+    const l = r.limits || {};
+    document.getElementById('stat-hits-today').textContent = (s.totalHitsToday || 0).toLocaleString();
+    document.getElementById('stat-hits-total').textContent = (s.totalHitsAll || 0).toLocaleString();
+    const limit = l.trafficLimitDaily || 0;
+    const remaining = limit >= 999999999 ? 'Unlimited' : (limit - (s.totalHitsToday || 0)).toLocaleString();
+    document.getElementById('stat-remaining').textContent = remaining;
+  } catch(e) { console.error(e); }
+}
+
+async function loadFingerprints() {
+  try {
+    const r = await api('/api/fingerprint/list');
+    document.getElementById('stat-fingerprints').textContent = (r.fingerprints || []).length;
+  } catch(e) { console.error(e); }
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.main > div[id^="tab-"]').forEach(d => d.style.display = 'none');
+  const el = document.getElementById('tab-' + tab);
+  if (el) el.style.display = 'block';
+  if (tab === 'dashboard') { loadStats(); loadFingerprints(); }
+}
+
+function logout() {
+  localStorage.removeItem('vuma_token');
+  document.cookie = 'vumaToken=; path=/; max-age=0';
+  window.location.href = '/';
+}
+
+function upgrade(planId) {
+  api('/api/checkout/create', { method: 'POST', body: { planId } }).then(r => {
+    if (r.payment_url) window.location.href = r.payment_url;
+    else if (r.message) alert(r.message + '\n\nBCA: 1234567890\nAmount: $' + (r.transaction?.amount || ''));
+  }).catch(e => alert(e.message));
+}
+
+function saveSettings() {
+  const name = document.getElementById('settings-name').value;
+  api('/api/admin/users/self', { method: 'PUT', body: { name } })
+    .then(() => alert('Saved!'))
+    .catch(e => alert(e.message));
+}
+
+loadStats();
+loadFingerprints();
+</script>
+</body>
+</html>

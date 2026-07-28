@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Vuma Traffic</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script defer src="/admin/public/js/alpine.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0F172A;color:#F8FAFC;overflow-x:hidden;min-height:100vh}
+    [x-cloak]{display:none!important}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:#0F172A}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:999px}
+
+    /* ── Layout ── */
+    .shell{display:flex;min-height:100vh}
+
+    /* ── Sidebar ── */
+    .side{width:220px;background:rgba(255,255,255,0.02);border-right:1px solid rgba(255,255,255,0.04);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh}
+    .side-logo{padding:1.5rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .side-logo h1{font-size:1.25rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+    .side-logo p{font-size:0.6875rem;color:#475569;margin-top:0.25rem}
+    .side-nav{flex:1;padding:0.375rem 0.5rem}
+    .side-label{padding:0.625rem 0.625rem 0.25rem;font-size:0.625rem;font-weight:600;color:#334155;text-transform:uppercase;letter-spacing:0.06em}
+    .side-link{display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.625rem;border-radius:0.5rem;font-size:0.75rem;color:#64748b;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left}
+    .side-link:hover{background:rgba(255,255,255,0.03);color:#94a3b8}
+    .side-link.active{background:rgba(34,197,94,0.06);color:#22c55e}
+    .side-link svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5}
+    .side-foot{padding:0.75rem;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;gap:0.625rem}
+    .side-foot .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:0.6875rem;font-weight:700;flex-shrink:0}
+    .side-foot .info{flex:1;min-width:0}
+    .side-foot .name{font-size:0.75rem;font-weight:600}
+    .side-foot .role{font-size:0.625rem;color:#475569}
+
+    /* ── Main ── */
+    .content{flex:1;padding:1.75rem 2rem;min-height:100vh}
+    .page-head{margin-bottom:1.5rem}
+    .page-head h1{font-size:1.375rem;font-weight:700;letter-spacing:-0.01em}
+    .page-head p{color:#64748b;font-size:0.8125rem;margin-top:0.125rem}
+
+    /* ── Glass Card ── */
+    .gc{background:rgba(255,255,255,0.02);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.04);border-radius:1rem;padding:1.25rem}
+    .gc h3{font-size:0.8125rem;font-weight:600;color:#94a3b8;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+    .gc h3 svg{width:14px;height:14px;stroke:#22c55e;fill:none;stroke-width:1.5}
+
+    /* ── Stats Row ── */
+    .srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1rem}
+    .scard{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:0.875rem;padding:1rem}
+    .scard .label{font-size:0.6875rem;color:#475569;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.25rem}
+    .scard .val{font-size:1.625rem;font-weight:700;letter-spacing:-0.02em}
+    .scard .sub{font-size:0.75rem;color:#475569;margin-top:0.125rem}
+
+    /* ── Grid ── */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+    @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+    .gc-full{margin-bottom:1rem}
+
+    /* ── Table ── */
+    table{width:100%;border-collapse:collapse;font-size:0.8125rem}
+    th{text-align:left;padding:0.625rem 0.875rem;color:#475569;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.04em}
+    td{padding:0.625rem 0.875rem;border-bottom:1px solid rgba(255,255,255,0.02)}
+    tr:hover td{background:rgba(255,255,255,0.01)}
+
+    /* ── Badge ── */
+    .badge{display:inline-block;padding:0.125rem 0.5rem;border-radius:999px;font-size:0.6875rem;font-weight:500}
+    .badge-free{background:rgba(100,116,139,0.1);color:#94a3b8}
+    .badge-starter{background:rgba(59,130,246,0.1);color:#60a5fa}
+    .badge-pro{background:rgba(139,92,246,0.1);color:#a78bfa}
+    .badge-enterprise{background:rgba(34,197,94,0.1);color:#22c55e}
+    .badge-active{background:rgba(34,197,94,0.08);color:#22c55e}
+    .badge-suspended{background:rgba(234,179,8,0.08);color:#eab308}
+
+    /* ── Buttons ── */
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-radius:0.5rem;font-size:0.8125rem;font-weight:600;border:none;cursor:pointer;transition:all 0.2s}
+    .btn-primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(34,197,94,0.2)}
+    .btn-secondary{background:rgba(255,255,255,0.04);color:#94a3b8;border:1px solid rgba(255,255,255,0.06)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.06)}
+    .btn-danger{background:rgba(239,68,68,0.08);color:#fca5a5;border:1px solid rgba(239,68,68,0.15)}
+    .btn-danger:hover{background:rgba(239,68,68,0.15)}
+
+    /* ── Form ── */
+    input[type="text"],input[type="email"],input[type="password"],input[type="number"],select,textarea{width:100%;padding:0.5rem 0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:0.5rem;color:#F8FAFC;font-size:0.8125rem;outline:none;transition:border-color 0.2s}
+    input:focus,select:focus,textarea:focus{border-color:#22c55e}
+    select option{background:#0F172A;color:#F8FAFC}
+    label{display:block;font-size:0.75rem;color:#94a3b8;font-weight:500;margin-bottom:0.25rem}
+
+    /* ── Modal ── */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:50}
+    .modal{width:400px;max-width:90vw}
+
+    /* ── Plan Cards ── */
+    .plan-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .plan-card{text-align:center;padding:1.5rem}
+    .plan-card .plan-name{font-size:1.125rem;font-weight:700;margin-bottom:0.25rem}
+    .plan-card .plan-price{font-size:2rem;font-weight:800;color:#22c55e}
+    .plan-card .plan-period{font-size:0.75rem;color:#475569}
+    .plan-card .plan-users{font-size:0.75rem;color:#64748b;margin-top:0.5rem}
+
+    /* ── Alert ── */
+    .alert{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:0.5rem;padding:0.75rem;font-size:0.8125rem;color:#fca5a5;margin-bottom:0.75rem}
+  </style>
+</head>
+<body>
+
+<div x-data="admin()" x-init="init()" class="shell">
+  <!-- ── Sidebar ── -->
+  <aside class="side">
+    <div class="side-logo">
+      <h1>Vuma</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <nav class="side-nav">
+      <div class="side-label">Overview</div>
+      <button class="side-link" :class="tab==='dashboard'?'active':''" @click="tab='dashboard'">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <div class="side-label">Management</div>
+      <button class="side-link" :class="tab==='users'?'active':''" @click="tab='users';loadUsers()">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </button>
+      <button class="side-link" :class="tab==='plans'?'active':''" @click="tab='plans';loadPlans()">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Plans
+      </button>
+      <button class="side-link" :class="tab==='transactions'?'active':''" @click="tab='transactions';loadTx()">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Transactions
+      </button>
+    </nav>
+    <div class="side-foot">
+      <div class="av"><%= admin.email.charAt(0).toUpperCase() %></div>
+      <div class="info">
+        <div class="name"><%= admin.email %></div>
+        <div class="role">Admin</div>
+      </div>
+      <a href="/admin/logout" style="color:#475569;text-decoration:none;font-size:0.75rem">Logout</a>
+    </div>
+  </aside>
+
+  <!-- ── Content ── -->
+  <main class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div x-show="tab==='dashboard'" x-cloak>
+      <div class="page-head">
+        <h1>Dashboard</h1>
+        <p>Platform overview and user statistics.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="srow">
+        <div class="scard">
+          <div class="label">Total Users</div>
+          <div class="val" x-text="stats?.users?.total || 0"></div>
+          <div class="sub text-green-400" x-text="'+' + (stats?.users?.newToday || 0) + ' today'"></div>
+        </div>
+        <div class="scard">
+          <div class="label">Active Users</div>
+          <div class="val text-green-400" x-text="stats?.users?.active || 0"></div>
+        </div>
+        <div class="scard">
+          <div class="label">Revenue</div>
+          <div class="val" x-text="'$' + formatNum(stats?.transactions?.totalRevenue || 0)"></div>
+          <div class="sub" x-text="(stats?.transactions?.paid || 0) + ' paid'"></div>
+        </div>
+        <div class="scard">
+          <div class="label">Pending Payments</div>
+          <div class="val text-yellow-400" x-text="stats?.transactions?.pending || 0"></div>
+        </div>
+      </div>
+
+      <!-- Plan Distribution -->
+      <div class="gc gc-full">
+        <h3>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          Plan Distribution
+        </h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem">
+          <template x-for="pd in (stats?.planDistribution || [])" :key="pd.planId">
+            <div style="text-align:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:0.5rem;border:1px solid rgba(255,255,255,0.03)">
+              <div class="val" style="font-size:1.25rem" x-text="pd._count"></div>
+              <div class="label" style="margin-top:0.25rem" x-text="pd.planId"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="gc gc-full">
+        <h3>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Recent Activity
+        </h3>
+        <div class="max-h-64 overflow-y-auto">
+          <template x-for="log in (stats?.recentLogs || []).slice(0,15)" :key="log.id">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+              <div>
+                <span style="font-size:0.8125rem;font-weight:500" x-text="log.action"></span>
+                <span style="font-size:0.75rem;color:#475569;margin-left:0.5rem" x-text="log.detail"></span>
+              </div>
+              <span style="font-size:0.6875rem;color:#334155" x-text="fmtTime(log.createdAt)"></span>
+            </div>
+          </template>
+          <div x-show="!stats?.recentLogs?.length" style="padding:2rem;text-align:center;color:#334155;font-size:0.875rem">No recent activity.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== USERS ===== -->
+    <div x-show="tab==='users'" x-cloak>
+      <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Users</h1><p>Manage users and their plans.</p></div>
+        <button @click="showAddUser=true" class="btn btn-primary">+ Add User</button>
+      </div>
+
+      <div class="gc gc-full" style="padding:0;overflow:hidden">
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Hits</th><th></th>
+          </tr></thead>
+          <tbody>
+            <template x-for="u in users" :key="u.id">
+              <tr>
+                <td style="font-weight:500" x-text="u.name"></td>
+                <td style="color:#64748b" x-text="u.email"></td>
+                <td><span class="badge" :class="'badge-'+u.planId" x-text="u.planId?.toUpperCase()"></span></td>
+                <td><span class="badge" :class="u.status==='active'?'badge-active':'badge-suspended'" x-text="u.status"></span></td>
+                <td style="color:#64748b" x-text="u.totalHitsToday"></td>
+                <td><select @change="changePlan(u.id,$event.target.value)" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:0.25rem;padding:0.25rem 0.375rem;font-size:0.6875rem;color:#94a3b8;cursor:pointer">
+                  <option value="free">Free</option><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option>
+                </select></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <div x-show="!users.length" style="padding:3rem;text-align:center;color:#334155;font-size:0.875rem">No users found.</div>
+      </div>
+
+      <!-- Add User Modal -->
+      <div x-show="showAddUser" x-cloak class="modal-bg" @click.self="showAddUser=false">
+        <div class="gc modal">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:#F8FAFC">Add New User</h3>
+          <form @submit.prevent="createUser()">
+            <div class="mb-3"><label>Name</label><input type="text" x-model="newUser.name" required></div>
+            <div class="mb-3"><label>Email</label><input type="email" x-model="newUser.email" required></div>
+            <div class="mb-3"><label>Password</label><input type="password" x-model="newUser.password" required></div>
+            <div class="mb-3"><label>Plan</label><select x-model="newUser.planId"><option value="free">Free</option><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select></div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem">
+              <button type="button" @click="showAddUser=false" class="btn btn-secondary">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PLANS ===== -->
+    <div x-show="tab==='plans'" x-cloak>
+      <div class="page-head">
+        <h1>Plans</h1>
+        <p>Manage pricing plans and feature flags.</p>
+      </div>
+      <div class="plan-row">
+        <template x-for="p in plans" :key="p.id">
+          <div class="gc plan-card">
+            <div class="plan-name" x-text="p.name"></div>
+            <div class="plan-price" x-text="'$' + Math.round(p.priceMonthly/16000)"></div>
+            <div class="plan-period">/month</div>
+            <div class="plan-users" x-text="p.userCount + ' users'"></div>
+            <div style="margin-top:0.75rem;font-size:0.75rem;color:#64748b" x-text="p.trafficLimitDaily >= 999999999 ? 'Unlimited visits' : formatNum(p.trafficLimitDaily) + ' visits/day'"></div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- ===== TRANSACTIONS ===== -->
+    <div x-show="tab==='transactions'" x-cloak>
+      <div class="page-head">
+        <h1>Transactions</h1>
+        <p>Payment history and pending payments.</p>
+      </div>
+      <div class="gc gc-full" style="padding:0;overflow:hidden">
+        <table>
+          <thead><tr><th>Date</th><th>User</th><th>Plan</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <template x-for="tx in transactions" :key="tx.id">
+              <tr>
+                <td style="color:#64748b" x-text="fmtDate(tx.createdAt)"></td>
+                <td x-text="tx.user?.name || '-'"></td>
+                <td x-text="tx.plan?.name || '-'"></td>
+                <td style="font-weight:600" x-text="'$' + formatNum(tx.amount)"></td>
+                <td><span class="badge" :class="tx.paymentStatus==='paid'?'badge-active':tx.paymentStatus==='pending'?'badge-suspended':'badge-free'" x-text="tx.paymentStatus"></span></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <div x-show="!transactions.length" style="padding:3rem;text-align:center;color:#334155;font-size:0.875rem">No transactions yet.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function admin() {
+  return {
+    tab: 'dashboard',
+    stats: null,
+    users: [],
+    plans: [],
+    transactions: [],
+    showAddUser: false,
+    newUser: { name:'', email:'', password:'', planId:'free' },
+
+    async init() { await this.loadStats(); },
+    async api(path, opts={}) {
+      const c = new AbortController();
+      setTimeout(()=>c.abort(),30000);
+      const h = {'Content-Type':'application/json',...opts.headers};
+      try {
+        const r = await fetch(path,{...opts,headers:h,body:opts.body?JSON.stringify(opts.body):undefined,signal:c.signal});
+        clearTimeout(c._t);
+        const d = await r.json();
+        if(!r.ok) throw new Error(d.error||'Error');
+        return d;
+      } catch(e){if(e.name==='AbortError')throw new Error('Timeout');throw e;}
+    },
+
+    async loadStats() {
+      try { this.stats = await this.api('/api/admin/stats'); } catch(e){ console.error(e); }
+    },
+    async loadUsers() {
+      try { const d = await this.api('/api/admin/users'); this.users = d.users||[]; } catch(e){ console.error(e); }
+    },
+    async loadPlans() {
+      try { const d = await this.api('/api/admin/plans'); this.plans = d.plans||[]; } catch(e){ console.error(e); }
+    },
+    async loadTx() {
+      try { const d = await this.api('/api/admin/transactions'); this.transactions = d.transactions||[]; } catch(e){ console.error(e); }
+    },
+    async createUser() {
+      try {
+        await this.api('/api/admin/users',{method:'POST',body:this.newUser});
+        this.showAddUser=false;
+        this.newUser={name:'',email:'',password:'',planId:'free'};
+        await this.loadUsers();
+      } catch(e){ alert(e.message); }
+    },
+    async changePlan(userId,planId) {
+      try {
+        await this.api('/api/admin/users/'+userId+'/plan',{method:'PUT',body:{planId}});
+      } catch(e){ alert(e.message); }
+    },
+    formatNum(n) { return new Intl.NumberFormat('en-US').format(n||0); },
+    fmtTime(d) { return d ? new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '-'; },
+    fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '-'; },
+  };
+}
+</script>
+</body>
+</html>

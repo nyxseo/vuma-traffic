@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in - Vuma Traffic</title>
+  <meta name="description" content="Sign in to your Vuma Traffic account to manage your plan, view stats, and generate traffic.">
+  <link rel="canonical" href="https://traffic.nyxseo.com/login">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#020617;color:#f1f5f9;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,0.06),transparent 60%);pointer-events:none}
+    .card{background:rgba(255,255,255,0.03);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.06);border-radius:1.25rem;padding:2.5rem;width:100%;max-width:400px;position:relative}
+    .logo{font-size:1.375rem;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
+    h1{font-size:1.375rem;font-weight:700;margin-top:0.25rem;margin-bottom:0.25rem}
+    .sub{color:#64748b;font-size:0.8125rem;margin-bottom:1.75rem}
+    label{display:block;font-size:0.8125rem;font-weight:500;color:#94a3b8;margin-bottom:0.375rem}
+    input{width:100%;padding:0.75rem 1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;color:#f1f5f9;font-size:0.875rem;outline:none;transition:border-color 0.2s}
+    input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+    input::placeholder{color:#475569}
+    .btn{width:100%;padding:0.75rem;border-radius:0.75rem;font-size:0.875rem;font-weight:600;border:none;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;transition:all 0.25s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(59,130,246,0.3)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:0.75rem;padding:0.75rem;font-size:0.8125rem;color:#fca5a5;margin-bottom:1rem;display:none}
+    .footer{text-align:center;margin-top:1.5rem;font-size:0.8125rem;color:#475569}
+    .footer a{color:#60a5fa;text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div style="text-align:center;margin-bottom:0.5rem">
+      <a href="/" class="logo">Vuma</a>
+      <h1>Welcome back</h1>
+      <p class="sub">Sign in to your account to continue.</p>
+    </div>
+
+    <div id="error" class="error" role="alert"></div>
+
+    <form onsubmit="handleLogin(event)" autocomplete="off">
+      <div style="margin-bottom:1rem">
+        <label for="email">Email address</label>
+        <input id="email" type="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div style="margin-bottom:1.5rem">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+      <button type="submit" id="submitBtn" class="btn">Sign in</button>
+    </form>
+
+    <div class="footer">
+      Don't have an account? <a href="/register">Create one free</a>
+    </div>
+  </div>
+
+  <script>
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const err = document.getElementById('error');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      err.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Invalid credentials');
+
+        localStorage.setItem('vuma_token', data.token);
+        localStorage.setItem('vuma_refresh', data.refreshToken);
+        localStorage.setItem('vuma_user', JSON.stringify(data.user));
+        document.cookie = 'vumaToken=' + data.token + '; path=/; max-age=' + (60*60*24*7);
+        window.location.href = '/dashboard';
+      } catch(e) {
+        err.textContent = e.message;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    }
+  </script>
+</body>
+</html>

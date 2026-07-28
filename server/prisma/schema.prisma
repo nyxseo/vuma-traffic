@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider      = "postgresql"
+  url           = env("DATABASE_URL")
+  relationMode  = "prisma"
+}
+
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  role            String   @default("user") // "user" | "admin"
+  planId          String   @default("free")
+  machineId       String   @default("")
+  ipAddress       String   @default("")
+  status          String   @default("active") // "active" | "suspended" | "banned"
+  totalHitsToday  Int      @default(0)
+  totalHitsAll    Int      @default(0)
+  dataUsedToday   Int      @default(0)
+  lastActiveAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions Transaction[]
+  apiKeys      ApiKey[]
+}
+
+model Plan {
+  id                    String   @id @default(uuid())
+  name                  String   @unique // "Free" | "Starter" | "Pro" | "Enterprise"
+  description           String   @default("")
+  priceMonthly          Float    @default(0)
+  priceYearly           Float    @default(0)
+  trafficLimitDaily     Int      @default(500)
+  fingerprintLimit      Int      @default(5)
+  threadLimit           Int      @default(1)
+  isProxyEnabled        Boolean  @default(false)
+  isAdNetworksEnabled   Boolean  @default(false)
+  isBoostRpmEnabled     Boolean  @default(false)
+  isVerifiedFingerprint Boolean  @default(false)
+  isViewAds             Boolean  @default(false)
+  isSearchEngine        Boolean  @default(false)
+  platforms             String   @default("[]") // JSON array
+  searchEngines         String   @default("[]") // JSON array
+  features              String   @default("{}") // JSON object
+  isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  userId        String
+  planId        String
+  amount        Float
+  paymentMethod String   @default("manual")
+  paymentStatus String   @default("pending") // "pending" | "paid" | "failed" | "refunded"
+  notes         String   @default("")
+  createdAt     DateTime @default(now())
+  paidAt        DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+}
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  userId     String
+  key        String    @unique
+  name       String    @default("default")
+  isActive   Boolean   @default(true)
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TrafficSource {
+  id         String   @id @default(uuid())
+  url        String
+  name       String   @default("")
+  category   String   @default("general") // "general" | "search" | "social" | "video" | "news"
+  isActive   Boolean  @default(true)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model Fingerprint {
+  id        String   @id @default(uuid())
+  userId    String
+  fp        String   @unique
+  device    String   @default("")
+  os        String   @default("")
+  browser   String   @default("")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String   // "login" | "traffic_start" | "traffic_stop" | "fingerprint_verify" | etc
+  detail    String   @default("")
+  ip        String   @default("")
+  createdAt DateTime @default(now())
+}

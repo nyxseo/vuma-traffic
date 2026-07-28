@@ -1,8 +1,8 @@
 #################################################
-#          JAGO TRAFFIC (Jago Code)             #
+#          VUMA TRAFFIC (Vuma Technologies)     #
 #                                               #
-#  Website       : https://traffic.jagocode.id  #
-#  Documentation : https://docs.jagocode.id     #
+#  Website       : https://traffic.nyxseo.com  #
+#  Documentation : https://docs.nyxseo.com      #
 #  Last Update   : 08 May 2025 03:01            #
 #################################################
 

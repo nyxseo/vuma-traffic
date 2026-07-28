@@ -1,8 +1,8 @@
-# Introduction
+# Vuma Traffic
 
-[Jago Traffic](https://traffic.jagocode.id) comes with various advanced features to increase traffic automatically with safer, more realistic, and more flexible methods.
+[Vuma Traffic](https://traffic.nyxseo.com) is an advanced automation tool designed to increase traffic, enhance engagement, and provide real-time performance tracking across multiple platforms — with safer, more realistic, and more flexible methods.
 
-## Core Features  
+## Core Features
 
 - **Multi-Platform Compatibility**: Can run on multiple platforms for maximum flexibility in increasing traffic.
 - **Advanced Multi-Threading**: Run multiple tasks simultaneously on multiple platforms with threading techniques for high efficiency.
@@ -23,21 +23,61 @@
 - **Verified Traffic Sources**: 20 categories are available with millions of quality site lists for more credible traffic sources.
 - **Custom Traffic Sources**: Allows users to specify traffic sources such as social media, search engines, or direct visits.
 - **Ad Network Compatibility**: Can be used for various types of ads such as AdSense, Adsterra, MgId, Monetag, and other platforms without violating policies.
-- **Comprehensive Documentation**: Complete guide to help users understand Jago Traffic configuration and features easily.
+- **Comprehensive Documentation**: Complete guide to help users understand Vuma Traffic configuration and features easily.
 - **Plugin Support**: Allows feature expansion with additional plugins according to user needs.
 
 ## Installation
 
+### Prerequisites
+- Node.js v16 or higher
+- npm (Node Package Manager)
+
+### Global Install
+
 ```bash
-npm i -g jagotraffic
-jagotraffic install
+npm i -g vuma
+vuma install
 ```
 
-## How to run
+## CLI Commands
+
+### `vuma install`
+Install all required dependencies including Puppeteer browser binaries and configure the environment.
 
 ```bash
-jagotraffic login
-jagotraffic start
+vuma install
 ```
 
-For more complete documentation, please visit the following link [https://docs.jagocode.id](https://docs.jagocode.id/docs/jago-traffic/getting-started/installation)
+### `vuma login`
+Authenticate with your Vuma Traffic account using an access key.
+
+```bash
+vuma login
+```
+
+You will be prompted to enter your access key. The key is saved to `~/.vuma/config.json` for subsequent sessions.
+
+### `vuma start`
+Start the traffic automation engine with your configured settings.
+
+```bash
+vuma start
+```
+
+### Shorthand Command
+
+All commands are also available via the `vt` shorthand:
+
+```bash
+vt install
+vt login
+vt start
+```
+
+## Documentation
+
+For complete documentation, please visit [https://docs.nyxseo.com](https://docs.nyxseo.com)
+
+## License
+
+MIT &copy; Vuma Technologies
